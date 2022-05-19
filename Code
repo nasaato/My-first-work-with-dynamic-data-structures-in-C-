@@ -1,0 +1,140 @@
+#include <iostream>
+#include <locale.h>
+using namespace std;
+
+bool k = true;
+struct Node {
+    string name;
+    double price;
+    int number;
+    Node* next;
+
+    Node(string _name, double _price, int _number) 
+    {
+        name = _name;
+        price = _price;
+        number = _number;
+
+        next = nullptr;
+    }
+};
+
+struct list {
+    Node* first;
+    Node* last;
+
+    list()
+    {
+        first = nullptr;
+        last = nullptr;
+    }
+
+    bool is_empty() {
+        return first == nullptr;
+    }
+
+    void push_back(string _name, double _price, int _number) {
+        Node* p = new Node(_name, _price, _number);
+        if (is_empty()) {
+            first = p;
+            last = p;
+            return;
+        }
+        last->next = p;
+        last = p;
+    }
+
+    void print() {
+        if (is_empty()) return;
+        Node* p = first;
+        while (p) {
+            cout << p->name << "\t" << p->price << "\t" << p->number << endl;
+            p = p->next;
+        }
+        cout << endl;
+    }
+
+    void remove_first() {
+        if (is_empty()) return;
+        Node* p = first;
+        first = p->next;
+        delete p;
+    }
+
+    void remove_last() {
+        if (is_empty()) return;
+        if (first == last) {
+            remove_first();
+            return;
+        }
+        Node* p = first;
+        while (p->next != last) p = p->next;
+        p->next = nullptr;
+        delete last;
+        last = p;
+    }
+
+    void remove(double price) {
+        if (is_empty()) return;
+        if (first->price > price) {
+            remove_first();
+            return;
+        }
+        else if (last->price > price) {
+            remove_last();
+            return;
+        }
+        Node* slow = first;
+        Node* fast = first->next;
+        while (fast && fast->price != price) {
+            fast = fast->next;
+            slow = slow->next;
+        }
+        if (!fast) {
+            cout << "This element does not exist" << endl;
+            k = false;
+            return ;
+        }
+        slow->next = fast->next;
+        delete fast;
+    }
+};
+
+int main() {
+    setlocale(LC_ALL, "ru");
+    list Phone;
+    cout << Phone.is_empty() << endl;
+    Phone.push_back("Iphone X\t", 67000, 7);
+    Phone.push_back("Redmi Note 9 Pro", 20000, 10);
+    Phone.push_back("Redmi Note 7 B/U", 5000, 3);
+    cout << Phone.is_empty() << endl;
+    Phone.print();
+    cout << "fill list of product:\n";
+    bool flag = true;
+    while (flag)
+    {
+        string name, just;
+        double price;
+        int num;
+        cout << "Name:\t";
+        cin >> name;
+        cout << "\nPrice:\t";
+        cin >> price;
+        cout << "\nNumber(Количество товара):\t";
+        cin >> num;
+        Phone.push_back(name, price, num);
+        cout << "\nContune?\t1 - yes / 0 - no\n";
+        cin >> flag;
+        if (flag == 0)
+        {
+            flag = false;
+        }
+    }
+    Phone.print();
+    double NPrice;
+    cout << "Enter norm price: ";
+    cin >> NPrice;
+    while (k) { Phone.remove(NPrice); }
+    Phone.print();
+    return 0;
+}
